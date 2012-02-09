@@ -1,0 +1,64 @@
+%based on beamercolorthemewhale.sty and beamercolorthemeorchid.sty
+
+\mode<presentation>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Definicao das cores para estruturas usadas por outros temas
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Definicao de cores basicas
+\definecolor{loco3gray}{RGB}{104,104,104}
+\definecolor{loco3lightgray}{RGB}{238,238,238}
+\definecolor{loco3blue}{RGB}{35,110,175}
+
+\setbeamercolor*{normal text}{bg=white,fg=loco3gray}
+\setbeamercolor*{alerted text}{fg=black} % default
+\setbeamercolor*{example text}{fg=black} % default
+\setbeamercolor*{structure}{fg=black} % default
+
+\setbeamerfont{alerted text}{series=\bfseries} % default
+
+\setbeamercolor*{palette primary}{use=structure,fg=loco3lightgray,bg=structure.fg}
+\setbeamercolor*{palette secondary}{use=structure,fg=loco3lightgray,bg=structure.fg!75!black}
+\setbeamercolor*{palette tertiary}{use=structure,fg=loco3lightgray,bg=structure.fg}
+\setbeamercolor*{palette quaternary}{fg=black,bg=black!35} % default
+
+\setbeamercolor*{sidebar}{use=structure,bg=structure.fg} 
+
+\setbeamercolor*{palette sidebar primary}{use=structure,fg=structure.fg!10}
+\setbeamercolor*{palette sidebar secondary}{fg=white}
+\setbeamercolor*{palette sidebar tertiary}{use=structure,fg=structure.fg!50}
+\setbeamercolor*{palette sidebar quaternary}{fg=white}
+
+%\setbeamercolor*{item projected}{fg=black,bg=black!20}
+
+\setbeamercolor*{block title}{bg=loco3blue,fg=white}
+\setbeamercolor{block title alerted}{use=alerted text,fg=white,bg=alerted text.fg!75!black}
+\setbeamercolor{block title example}{use=example text,fg=white,bg=example text.fg!75!black}
+
+\setbeamercolor*{block body}{bg=loco3lightgray,fg=loco3gray}
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!10!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!10!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!10!bg}
+
+\setbeamercolor*{separation line}{}
+\setbeamercolor*{fine separation line}{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setbeamercolor*{TitlePage bar}{bg=loco3blue,fg=white}
+\setbeamercolor*{title}{bg=loco3blue,fg=white}
+
+\setbeamercolor*{Top bar}{bg=loco3blue,fg=white}
+\setbeamercolor*{Title bar}{bg=loco3blue,fg=white}
+\setbeamercolor*{Location bar}{bg=loco3blue, fg=white}
+
+\setbeamercolor*{frametitle}{parent=Title bar}
+\setbeamercolor*{section in head/foot}{bg=loco3blue,fg=white}
+
+\usecolortheme[named=loco3blue]{structure}
+
+\setbeamercolor*{titlelike}{parent=palette primary}
+
+\mode
+<all>
