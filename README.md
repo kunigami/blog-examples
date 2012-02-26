@@ -6,4 +6,4 @@ Related links:
 
 - [2012/02/12 - Pell equation](http://kuniga.me/blog/2012/02/12/equacoes-de-pell/) -- Haskell code to find first k solutions for pell equation
 
-- [2012/02/26 - Hibernate intrudction] (http://kuniga.me/blog/2012/02/26/introducao-a-hibernate/) -- Simple project using Hibernate
+- [2012/02/26 - Hibernate introduction] (http://kuniga.me/blog/2012/02/26/introducao-a-hibernate/) -- Simple project using Hibernate
