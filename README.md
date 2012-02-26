@@ -1,8 +1,6 @@
 Related links:
 
-- servlet-example
-  - Simple project using servlets
-  - Url: http://kuniga.me/blog/2011/12/11/java-servlets-no-tomcat/ 
+- [servlet-example](http://kuniga.me/blog/2011/12/11/java-servlets-no-tomcat/) -- Simple project using servlets
 
 - 2011/08/04 - Beamer themes
   - Custom beamer theme style files
