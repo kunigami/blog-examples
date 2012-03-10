@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
-#include <boost/bind.hpp>
 
 using namespace std;
 using namespace boost;
@@ -38,23 +36,8 @@ void FacilityLocation::readInput(const char *filename){
 
     fixed_cost.resize(m);
 
-    string line;
-    // Descarta linha em branco
-
-    getline(fin, line);
-    for(int j = 0; j < m; j++){
-        // Faz uma leitura robusta para contemplar os diferentes tipos
-        // de formatos        
-        getline(fin, line);
-
-        vector<string> data;
-        split(data, line, is_any_of(" "));
-        
-        // Remove tokens vazios
-        data.erase(remove_if(data.begin(), data.end(), bind(&string::empty, _1)), data.end());
-
-        fixed_cost[j] = atof(data[1].c_str());
-    }
+    for(int j = 0; j < m; j++)
+        fin >> trash >> fixed_cost[j];
 
     cost.resize(n);
     int demand; // Ignora demanda
