@@ -1,0 +1,62 @@
+\documentclass[12pt]{article}
+
+\usepackage{graphicx}
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+
+\begin{document}
+
+\emph{Método do Subgradiente}($\pi, T_\pi, N, u_0$)
+
+\begin{enumerate}
+ \setlength{\itemsep}{0.7pt}
+\item $\bar x^*$ //\emph{Melhor solução primal}
+\item Enquanto condição de parada não for satisfeita, faça:
+\item \qquad $x^* \leftarrow$ \emph{Dual\_lagrangeano}()
+\item \qquad Se $f'(x^*) \ge z_{UB}$, faça:
+\item \qquad \qquad $z_{LB} \leftarrow f'(x^*)$;
+\item \qquad \qquad $n_{stuck} \leftarrow 0$;
+\item \qquad Caso contrário faça:
+\item \qquad \qquad $n_{stuck} \leftarrow n_{stuck} + 1$;
+\item \qquad $\bar x \leftarrow$ \emph{Heurística\_Lagrangeana()};
+  //\emph{Solução primal viável}
+\item \qquad Se o valor de $f(\bar x) \le z_{LB}$, faça: 
+\item \qquad \qquad $z_{LB} \leftarrow f(\bar x)$;
+\item \qquad \qquad $\bar x^* \leftarrow \bar x$;
+\item \qquad Se $z_{LB} = z_{UB}$ //\emph{Encontramos a solução ótima}: 
+\item \qquad \qquad PARE;
+\item \qquad $u_l^{k + 1} \leftarrow$;
+  \emph{Atualiza\_multiplicadores}($\pi, z_{LB}, z_{UB}, u_l^{k}, x^*$);
+\item \qquad Se $n_{stuck} = N$, faça:
+\item \qquad \qquad $n_{stuck} \leftarrow 0$;
+\item \qquad \qquad $\pi \leftarrow \pi / 2.0$;
+\item \qquad \qquad Se $\pi \le T_\pi$:
+\item \qquad \qquad \qquad PARE;
+\item \qquad $k \leftarrow k + 1$;
+\item Retorne $\bar x^*$;
+
+\end{enumerate}
+
+\clearpage
+
+\emph{Atualiza\_multiplicadores}($\pi, z_{LB}, z_{UB}, u_l^{k}, x^*$) 
+
+\begin{enumerate}
+\item $G_\ell = b_\ell - \sum_{j = 1}^m a_{\ell j} x^*_{\ell j} \qquad \forall \ell \in R$
+\item $T = \dfrac{\pi(1.05 \cdot z_{UB} - z_{LB})}{\sum_{\ell \in R} G_\ell^2}$
+\item $u^{k + 1}_\ell = \max \{ 0, u^{k}_\ell + TG_\ell \}  \qquad
+  \forall \ell \in R$
+\item Retorne $u^{k + 1}$
+\end{enumerate}
+
+
+\bibliographystyle{plain}
+\bibliography{refer} 
+ 
+\end{document}
+
