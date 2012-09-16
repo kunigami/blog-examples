@@ -1,7 +1,7 @@
 #include "ilp_solver.hpp"
 #include <iostream>
 
-PLISolver::PLISolver(const char *filename){
+ILPSolver::ILPSolver(const char *filename){
     
     int errors = solver.readLp(filename);      
     assert(errors == 0);    
@@ -9,11 +9,11 @@ PLISolver::PLISolver(const char *filename){
     maxSeconds = -1;
 } 
 
-void PLISolver::setMaxSeconds(int seconds){
+void ILPSolver::setMaxSeconds(int seconds){
     maxSeconds = seconds;
 }
 
-bool PLISolver::solve(){
+bool ILPSolver::solve(){
     
     // Pass data and solver to CbcModel 
     CbcModel model(solver);

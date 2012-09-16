@@ -1,5 +1,5 @@
-#ifndef PLI_SOLVER_HPP
-#define PLI_SOLVER_HPP
+#ifndef ILP_SOLVER_HPP
+#define ILP_SOLVER_HPP
 
 #include "CbcModel.hpp"
 #include "OsiClpSolverInterface.hpp"
@@ -7,8 +7,8 @@
 #include <vector>
 using namespace std;
 
-/* Solves a PLI reading from a .lp file */
-struct PLISolver {
+/* Solves a ILP reading from a .lp file */
+struct ILPSolver {
     
     vector<double> solution;
 
@@ -17,7 +17,7 @@ struct PLISolver {
     int maxSeconds;
  
     // Load the model from filename
-    PLISolver(const char *filename);   
+    ILPSolver(const char *filename);   
 
     // Time limit for solving
     void setMaxSeconds(int);

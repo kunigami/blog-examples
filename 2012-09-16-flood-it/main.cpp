@@ -32,10 +32,10 @@ int main(int argc, char **argv){
     board.info();
 
     for(int k = board.ncolors; k < board.nlabels; k++){
-        FloodPLIGenerator pliGen(board, k);
+        FloodILPGenerator pliGen(board, k);
         pliGen.generate("tmp.lp");
 
-        PLISolver solver("tmp.lp");
+        ILPSolver solver("tmp.lp");
         bool opt = solver.solve();
 
         if(opt){

@@ -3,7 +3,7 @@
 #include <cmath>
 #include <algorithm>
 
-FloodPLIGenerator::FloodPLIGenerator(Board &b, int k) : _b(b) {
+FloodILPGenerator::FloodILPGenerator(Board &b, int k) : _b(b) {
 
     // Theorem 5
     int n = max(b.h, b.w);
@@ -16,11 +16,11 @@ FloodPLIGenerator::FloodPLIGenerator(Board &b, int k) : _b(b) {
     ySize = maxT*maxL;
 }
 
-int FloodPLIGenerator::getNumVars(){
+int FloodILPGenerator::getNumVars(){
     return xSize + ySize;
 }
 
-void FloodPLIGenerator::buildObjFunc(){
+void FloodILPGenerator::buildObjFunc(){
 
     LPGenerator::objFunc.clear();
     for(size_t c = 0; c < maxC; c++)
@@ -29,7 +29,7 @@ void FloodPLIGenerator::buildObjFunc(){
 
 }
  
-void FloodPLIGenerator::buildConstraints(){
+void FloodILPGenerator::buildConstraints(){
 
     // Each component must be covered at maximum once
     LPGenerator::constraints.clear();
@@ -102,19 +102,19 @@ void FloodPLIGenerator::buildConstraints(){
 
 }
 
-int FloodPLIGenerator::x(int c, int t){
+int FloodILPGenerator::x(int c, int t){
     return c*maxT + t;
 }
 
-int FloodPLIGenerator::y(int i, int t){
+int FloodILPGenerator::y(int i, int t){
     return xSize + i*maxT + t;
 }
 
-void FloodPLIGenerator::setVarTypes(){    
+void FloodILPGenerator::setVarTypes(){    
     LPGenerator::varTypes.assign(getNumVars(), Variable::BINARY);
 }
 
-void FloodPLIGenerator::setBounds(){
+void FloodILPGenerator::setBounds(){
     LPGenerator::bounds.clear();
     LPGenerator::bounds.push_back(Bound(y(0, 0), 1.0));
     for(int i = 1; i < maxL; i++){
@@ -122,7 +122,7 @@ void FloodPLIGenerator::setBounds(){
     }
 }
 
-vector<int> FloodPLIGenerator::extractMovements(vector<double> lpSolution){
+vector<int> FloodILPGenerator::extractMovements(vector<double> lpSolution){
     vector<int> movements;
     for(int t = 1; t < maxT; t++){
         int chosenColor = -1;

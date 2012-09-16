@@ -4,7 +4,7 @@
 #include "board.hpp"
 #include "cbc/lp_generator.hpp"
 
-class FloodPLIGenerator : public LPGenerator {
+class FloodILPGenerator : public LPGenerator {
     
     Board &_b;
     // Maximum number of movements
@@ -20,7 +20,7 @@ class FloodPLIGenerator : public LPGenerator {
 
 public:
 
-    FloodPLIGenerator(Board &b, int k = -1);
+    FloodILPGenerator(Board &b, int k = -1);
     
     int x(int c, int t);
     int y(int i, int t);
