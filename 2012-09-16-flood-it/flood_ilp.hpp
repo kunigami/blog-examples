@@ -1,5 +1,5 @@
-#ifndef FLOOD_PLI_HPP
-#define FLOOD_PLI_HPP
+#ifndef FLOOD_ILP_HPP
+#define FLOOD_ILP_HPP
 
 #include "board.hpp"
 #include "cbc/lp_generator.hpp"

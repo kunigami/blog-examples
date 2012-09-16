@@ -24,11 +24,11 @@ else()
    set(CBC_INCLUDES ${CBC_HOME}/include/coin)
    set(CBC_LIBRARIES ${CBC} ${CGL} ${CLP} ${OSI} ${COIN_UTILS} ${OSICLP})
 
-   set(PLI_SRCS cbc/lp_generator.cpp cbc/pli_solver.cpp)
+   set(ILP_SRCS cbc/lp_generator.cpp cbc/ilp_solver.cpp)
    include_directories(cbc)
    include_directories(${CBC_INCLUDES})
 
-   add_executable(solver main.cpp flood_pli.cpp board.cpp cbc/lp_generator.cpp cbc/pli_solver.cpp)
+   add_executable(solver main.cpp flood_ilp.cpp board.cpp cbc/lp_generator.cpp cbc/ilp_solver.cpp)
 
    # link solver to COIN-OR
    target_link_libraries(solver ${CBC_LIBRARIES})

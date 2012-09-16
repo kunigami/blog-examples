@@ -1,4 +1,4 @@
-#include "pli_solver.hpp"
+#include "ilp_solver.hpp"
 #include <iostream>
 
 PLISolver::PLISolver(const char *filename){

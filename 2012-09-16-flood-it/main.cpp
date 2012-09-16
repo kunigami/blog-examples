@@ -5,8 +5,8 @@
 using namespace std;
 
 #include "board.hpp"
-#include "flood_pli.hpp"
-#include "cbc/pli_solver.hpp"
+#include "flood_ilp.hpp"
+#include "cbc/ilp_solver.hpp"
 
 vector< vector< int > > mat;
 
