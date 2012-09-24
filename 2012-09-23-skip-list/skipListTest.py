@@ -68,14 +68,10 @@ class SkipListTest(unittest.TestCase):
         self.assertEqual(None, self.sl.find(1))
 
     def testInsertion(self):
-        # l = LinkedList()
-        # for i in range(N):
-        #     l.insert(randint(1, N))
         print 'Inserting 10000 elements in a Skip List'
         # Test execution time for a O(log n) operations
         print 'Execution time:  %.2fs' % (Timer(self.insertManyElementsInSkipList).timeit(number=2))
         print 'Number of elements: %d' % (len(self.sl))
-        print 'Number of nodes:    %d' % (self.sl.nodes)
 
         print 'Inserting 10000 elements in a Linked List'
         print 'Execution time: %.2fs' % (Timer(self.insertManyElementsInLinkedList).timeit(number=1))
