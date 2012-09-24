@@ -76,11 +76,3 @@ class SkipList:
                 print x.next[i].elem,
                 x = x.next[i]
             print ''
-
-
-sl = SkipList()
-sl.insert(1)
-sl.remove(1)
-sl.insert(2)
-sl.insert(3)
-sl.printList()
