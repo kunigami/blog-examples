@@ -11,6 +11,7 @@ class SkipList:
     def __init__(self):
         self.head = SkipNode()
         self.len = 0
+        self.maxHeight = 0
 
     def __len__(self):
         return self.len
@@ -30,9 +31,9 @@ class SkipList:
         return height
 
     def updateList(self, elem):
-        update = [None]*len(self.head.next)
+        update = [None]*self.maxHeight
         x = self.head
-        for i in range(len(self.head.next)-1, -1, -1):
+        for i in reversed(range(self.maxHeight)):
             while x.next[i] != None and x.next[i].elem < elem:
                 x = x.next[i]
             update[i] = x
@@ -43,6 +44,7 @@ class SkipList:
 
         node = SkipNode(self.randomHeight(), elem)
         # Make sure that the head has at least the maximum level
+        self.maxHeight = max(self.maxHeight, len(node.next))
         while len(self.head.next) < len(node.next):
             self.head.next.append(None)
 
@@ -61,9 +63,11 @@ class SkipList:
         update, x = self.updateList(elem)
 
         if x != None and x.elem == elem:
-            for i in range(len(x.next)-1, -1, -1):
+            for i in reversed(range(len(x.next))):
                 update[i].next[i] = x.next[i]
-            self.len -= 1
+                if self.head.next[i] == None:
+                    self.maxHeight -= 1
+            self.len -= 1            
                 
     def printList(self):
         for i in range(len(self.head.next)-1, -1, -1):
@@ -72,3 +76,11 @@ class SkipList:
                 print x.next[i].elem,
                 x = x.next[i]
             print ''
+
+
+sl = SkipList()
+sl.insert(1)
+sl.remove(1)
+sl.insert(2)
+sl.insert(3)
+sl.printList()
