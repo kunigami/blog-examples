@@ -16,13 +16,17 @@ class SkipList:
     def __len__(self):
         return self.len
 
-    def find(self, elem):
-        dummy, x = self.updateList(elem)
-        return x
-
-    def contains(self, elem):
-        x = self.find(elem)        
-        return x != None and x.elem == elem
+    def find(self, elem, update = None):
+        if update == None:
+            update = self.updateList(elem)
+        if len(update) > 0:
+            candidate = update[0].next[0]
+            if candidate != None and candidate.elem == elem:
+                return candidate
+        return None
+    
+    def contains(self, elem, update = None):
+        return self.find(elem, update) != None
 
     def randomHeight(self):
         height = 1
@@ -37,22 +41,18 @@ class SkipList:
             while x.next[i] != None and x.next[i].elem < elem:
                 x = x.next[i]
             update[i] = x
-        candidate = update[0].next[0] if len(update) > 0 else None
-        return update, candidate
+        return update
         
     def insert(self, elem):
 
         node = SkipNode(self.randomHeight(), elem)
-        # Make sure that the head has at least the maximum level
+
         self.maxHeight = max(self.maxHeight, len(node.next))
         while len(self.head.next) < len(node.next):
             self.head.next.append(None)
 
-        update, x = self.updateList(elem)            
-        
-        if x != None and x.elem == elem:
-            return
-        else:
+        update = self.updateList(elem)            
+        if self.find(elem, update) == None:
             for i in range(len(node.next)):
                 node.next[i] = update[i].next[i]
                 update[i].next[i] = node
@@ -60,9 +60,9 @@ class SkipList:
 
     def remove(self, elem):
 
-        update, x = self.updateList(elem)
-
-        if x != None and x.elem == elem:
+        update = self.updateList(elem)
+        x = self.find(elem, update)
+        if x != None:
             for i in reversed(range(len(x.next))):
                 update[i].next[i] = x.next[i]
                 if self.head.next[i] == None:

@@ -8,7 +8,7 @@ class LinkedList:
 
     def __init__(self):
 
-        self.head = None
+        self.head = Node(None)
         self.len = 0
 
     def __len__(self):
@@ -16,40 +16,24 @@ class LinkedList:
 
     def find(self, elem):
         x = self.head
-        y = None
-        while x != None and x.elem <= elem:
-            y = x
+        while x.next != None and x.next.elem <= elem:
             x = x.next
-        return y
+        return x
 
     def insert(self, elem):
-        node = Node(elem)
-
-        y = self.find(elem)
-        
-        if y != None and y.elem == elem:
+        x = self.find(elem)
+        if x.elem == elem:
             return
-        
-        if y == None:
-            node.next = self.head
-            self.head = node
-        else:
-            node.next = y.next
-            y.next = node
+
+        node = Node(elem)
+        node.next = x.next
+        x.next = node
 
         self.len += 1
 
     def printList(self):
-        x = self.head
+        x = self.head.next
         while x != None:
             print x.elem,
             x = x.next
         print ''
-
-if __name__ == '__main__':
-    l = LinkedList()
-    l.insert(1)
-    l.insert(3)
-    l.insert(2)
-    l.insert(-1)
-    l.printList()

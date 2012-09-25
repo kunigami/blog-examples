@@ -66,33 +66,6 @@ class SkipListTest(unittest.TestCase):
 
     def testFindingAnElementNotInTheList(self):
         self.assertEqual(None, self.sl.find(1))
-
-    def testInsertion(self):
-        print 'Inserting 10000 elements in a Skip List'
-        # Test execution time for a O(log n) operations
-        print 'Execution time:  %.2fs' % (Timer(self.insertManyElementsInSkipList).timeit(number=2))
-        print 'Number of elements: %d' % (len(self.sl))
-
-        print 'Inserting 10000 elements in a Linked List'
-        print 'Execution time: %.2fs' % (Timer(self.insertManyElementsInLinkedList).timeit(number=1))
-        
-    def insertManyElementsInSkipList(self):
-        N = 10000
-        for i in range(N):
-            self.sl.insert(randint(1, N))
-            
-    def insertManyElementsInLinkedList(self):
-        N = 10000
-        l = LinkedList()
-        for i in range(N):
-            l.insert(randint(1, N))
-        print 'Number of elements: %d' % (len(l))
-
-def insertElements():
-    N = 10000
-    sl = SkipList()
-    for i in range(N):
-        sl.insert(randint(1, N))
  
 if __name__ == '__main__':
 
