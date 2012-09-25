@@ -41,7 +41,7 @@ def benchmark(generator):
     slt = benchmarkOperation(sl, insertions, seq)
     
     rbt = rbtree()
-    rbtt = benchmarkOperation(sl, insertions, seq)
+    rbtt = benchmarkOperation(rbt, insertions, seq)
 
     l = LinkedList()
     lt = benchmarkOperation(l, insertions, seq)
