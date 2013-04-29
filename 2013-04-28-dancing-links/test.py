@@ -22,5 +22,9 @@ class TestAlgorithmX(unittest.TestCase):
                [0, 0, 0, 1, 1, 0, 1]]
         self.check(mat, [0, 3, 4])
 
+    def testUnfeasible(self):
+        mat = [[0, 1, 1], [1, 1, 0]]
+        self.check(mat, [])
+        
 if __name__ == '__main__':
     unittest.main()
