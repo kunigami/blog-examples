@@ -97,22 +97,6 @@ class SparseMatrix:
         self.createLeftRightLinks(srow)
         self.createUpDownLinks(scol)
         
-    def __str__(self):
-        s = ''
-        byrow = [[ ] for _ in range(100)] 
-        
-        for col in RightIterator(self.head):
-            for cell in DownIterator(col):
-                byrow[cell.row].append(cell)
-
-        for r in byrow:
-            if len(r) == 0:
-                break
-            for c in r:
-                s += str(c) + ' '
-            s += '\n'
-        return s
-
 class DancingLinks:
 
     def __init__(self, mat):
@@ -163,15 +147,3 @@ class DancingLinks:
         self.uncover(col)
         
         return False
-
-mat = [[0, 0, 1, 0, 1, 1, 0],
-       [1, 0, 0, 1, 0, 0, 1],
-       [0, 1, 1, 0, 0, 1, 0],
-       [1, 0, 0, 1, 0, 0, 0],
-       [0, 1, 0, 0, 0, 0, 1],
-       [0, 0, 0, 1, 1, 0, 1]]
-
-solver = DancingLinks(mat)
-solution = solver.solve()
-sets = [n.row for n in solution]
-print 'sets ', sets
