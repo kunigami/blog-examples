@@ -3,7 +3,7 @@ from pyhash import murmur3_x64_128
 from math import log
 
 class BloomFilter:
-    def __init__(self, size, num_values):
+    def __init__(self, size, num_values, num_hashes=None):
         """Simple implementation of a Bloom filter.
 
         It stores a bit array internally of @size bits and expects
@@ -15,6 +15,8 @@ class BloomFilter:
         @num_values - number of distinct values we expect to insert/query
         in the bloom filter
 
+        @num_hashes - number of hash functions (optional). If not
+        provided, it's calculated from @size and @num_values
         """
         self.size = size
         self.bitArr = bitarray(size)
@@ -23,8 +25,10 @@ class BloomFilter:
 
         # Number of hash functions that minimizes the
         # probability of false positives
-        self.numHashes = max(5, int(log(2)*size/num_values))
-        self.numHashes = 2
+        if num_hashes is None:
+            self.numHashes = max(5, int(log(2)*size/num_values))
+        else:
+            self.numHashes = num_hashes
 
     def insert(self, value):
         hashes = self.__getHashes(value)
