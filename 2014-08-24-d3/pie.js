@@ -28,7 +28,6 @@ var color = d3.scale.category10();
 
 arcs.append("path")
     .attr("fill", function(d, i) {
-        console.log(d);
         return color(i);
     })
     .attr("stroke", "white")
