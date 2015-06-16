@@ -50,7 +50,6 @@ var USMap = {
 
     joinWithData: function(data) {
         // Index geo objects by state name
-        console.log(data);
         geoByState = {};
         this._geoJSON.features.forEach(function(feature) {
 	var jsonState = feature.properties.name;
