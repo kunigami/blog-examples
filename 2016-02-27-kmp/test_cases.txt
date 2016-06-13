@@ -1,0 +1,10 @@
+abc aaaaabcddddd
+ababac ababadacaaaaaaa
+ababac ababacababac
+aaaa aaaaaaaaaaaaaaaaaaaaaaaaa
+aaaa abaabaaabaaaabaaaaab
+na banananobano
+foobar foo
+foobarfoo barfoobarfoobarfoobarfoobarfoo
+# mismatch from the begining
+abc def
