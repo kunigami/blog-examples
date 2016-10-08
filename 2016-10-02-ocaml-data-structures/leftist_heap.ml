@@ -11,7 +11,7 @@
   The rank of a tree with n nodes is O(log n).
 
 *)
-module LeftistHeap = struct
+(* module LeftistHeap = struct *)
   type elemType = int
   (* We store the rank as part of the node *)
   type heapType = Empty | Tree of int * elemType * heapType * heapType
@@ -36,7 +36,7 @@ module LeftistHeap = struct
       | (heapA, Empty) -> heapA
       | (Empty, heapB) -> heapB
       | (Tree(r1, elem1, left1, right1), Tree(r2, elem2, left2, right2)) ->
-        if elem1 > elem2 then makeTree elem1 left1 (merge right1 heapB)
+        if elem1 < elem2 then makeTree elem1 left1 (merge right1 heapB)
         else makeTree elem2 left2 (merge right2  heapA)
 
   let insert (heap: heapType) (elem: elemType): heapType =
@@ -52,11 +52,22 @@ module LeftistHeap = struct
       | Empty -> Empty
       | Tree (_, _, left, right) -> merge left right
 
-end
+  let rec equals (heapA: heapType) (heapB: heapType) =
+    match (heapA, heapB) with
+      | (Empty, Empty) -> true
+      | (heapA, Empty) -> false
+      | (Empty, heapB) -> false
+      | (Tree(r1, elem1, left1, right1), Tree(r2, elem2, left2, right2)) ->
+        elem1 == elem2 &&
+        r1 == r2 &&
+        (equals left1 left2) &&
+        (equals right1 right2)
+
+(* end
 
 (* Examples *)
 
 let h = LeftistHeap.newHeap 10;;
 (* 11 becomes root *)
 let h = LeftistHeap.insert h 11;;
-let h = LeftistHeap.insert h 9;;
+let h = LeftistHeap.insert h 9;; *)
