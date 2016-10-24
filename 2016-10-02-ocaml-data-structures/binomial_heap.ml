@@ -1,25 +1,53 @@
 (*
 
-  A binomial tree can be defined recursively based on its rank. The base is a tree
-  of rank 1, which is a single node. A tree of rank n > 1, is defined as
+  A binomial tree can be defined recursively based on its rank. The base is a
+  tree of rank 0, which is a single node. A tree of rank r > 0, is formed by
+  combining two trees of rank r-1 making one tree the leftmost child of the
+  other. Examples:
 
+  rank 0: o
+
+  rank 1: o
+          |
+          o
+
+  rank 2: o
+         /|
+        o o
+        |
+        o
+
+  rank 3: o
+       / /|
+      o o o
+     /| |
+    o o o
+    |
+    o
+
+  A binomial heap is a list of binomial trees none of which has repeated ranks
+  and for each binomal tree the value of a node is always greater or equal to
+  its children.
 *)
 
+type rankType = int;;
 type elemType = int;;
 (*
-  The list of nodes in the subtree list is of decreasing order of rank
+  The list of nodes in the subtree list is of decreasing order of rank. For a
+  rank 3 tree, the list contains a list of [rank=2, rank=1, rank=0].
 *)
-type treeType = Node of int * elemType * treeType list;;
+type treeType = Node of rankTye * elemType * treeType list;;
 (*
-  The list of nodes in tree list is of increasing order of rank
+  The list of nodes in tree list is of increasing order of rank (note it's the
+  opposite order of the tree).
 *)
 type heapType = treeType list;;
 
 exception Invariant_violation of string;;
 
 (*
-  Construct a node by combining two nodes of the same rank
-  TODO: Add the invariant rank(heapA) = rank(heapB)
+  Construct a node by combining two nodes of the same rank. This is the
+  induction step on the definition of the tree.
 *)
 let link (treeA: treeType) (treeB: treeType): treeType =
   match (treeA, treeB) with
@@ -29,14 +57,18 @@ let link (treeA: treeType) (treeB: treeType): treeType =
       else Node (rankA + 1, elemB, treeA :: childrenB)
 ;;
 
+(*
+  Helper methods
+*)
 let rank (Node (rank, _, _)) = rank;;
 let root (Node (_, elem, _)) = elem;;
-let singletonTree (elem: elemType) = Node (1, elem, [])
-let emptyHeap = []
+let singletonTree (elem: elemType) = Node (1, elem, []);;
+let emptyHeap = [];;
 
 (*
   Inserts a tree inside a heap.
-  Invariant: rank tree >= rank of the highest ranked tree in the heap
+  Invariant: trees in the heap are sorted by increasing order of rank. No
+    repeated ranks.
 *)
 let rec insertTree (tree: treeType) (heap: heapType): heapType =
   match (tree, heap) with
@@ -47,12 +79,20 @@ let rec insertTree (tree: treeType) (heap: heapType): heapType =
       else if rank tree == rank lowestRankTree then
         insertTree (link tree lowestRankTree) rest
       else
-        insertTree tree rest
+        failwith "This condition should not happen. The heap would be empty"
 ;;
 
+(*
+  Inserts an element inside a heap.
+*)
 let insert (element: elemType) (heap: heapType): heapType =
   insertTree (singletonTree element) heap
+;;
 
+(*
+  Merge two heaps by merging their inner trees. Maintains the binomial heap
+  invariants.
+*)
 let rec merge (heapA: heapType) (heapB: heapType) =
   match (heapA, heapB) with
     | (heapA, []) -> heapA
@@ -82,6 +122,9 @@ let rec removeMinTree (heap: heapType) =
               else (Some minTree, tree :: minRest)
 ;;
 
+(*
+  Returns the minimum element from the heap.
+*)
 let findMin (heap: heapType) =
   let (minTree, _) = removeMinTree heap in
     match minTree with
@@ -89,6 +132,9 @@ let findMin (heap: heapType) =
       | Some tree -> Some (root tree)
 ;;
 
+(*
+  Removes the minimum element from the heap.
+*)
 let removeMin (heap: heapType) =
   let (minTree, rest) = removeMinTree heap in
   match minTree with
