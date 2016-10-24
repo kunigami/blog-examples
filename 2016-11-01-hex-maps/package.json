@@ -1,0 +1,13 @@
+{
+  "name": "Hex maps",
+  "version": "0.0.1",
+  "description": "Set of scripts to clean up data",
+  "devDependencies": {
+    "babel-polyfill": "^6.16.0"
+  },
+  "dependencies": {
+    "babel-register": "^6.16.3",
+    "d3": "^4.2.8",
+    "point-in-polygon": "^1.0.0"
+  }
+}
