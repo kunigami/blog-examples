@@ -35,14 +35,21 @@ countriesCodes.forEach(function(countryData) {
 
 const countryCenterByCountryCode = {};
 const projection = d3
-  .geoMercator()
-  .scale(1);
-countriesCenters.forEach(function(countryCenter) {
+  .geoMercator();
+
+/*
+ * Convert the lon-lat coordinate representing the center of the country to
+ * 2D using the mercator projection.
+ */
+const countryCentersProcessed = countriesCenters.map(countryCenter => {
   const code = countryCenter['iso 3166 country'];
   const lat = parseFloat(countryCenter['latitude']);
   const lon = parseFloat(countryCenter['longitude']);
-  const projectedCoordinates = projection([lon, lat]);
-  console.log(code, [lat, lon], projectedCoordinates);
+  const projected = projection([lon, lat]);
+  const x = projected[0];
+  const y = projected[1];
+  const row = [code, x.toFixed(1), y.toFixed(1)];
+  return row;
 });
 
 const invalidCountries = new Set([
@@ -126,15 +133,36 @@ borders.forEach(function(border) {
   });
 });
 
-const borderPairsSerialized = d3.csvFormat(Object.values(borderPairs));
+(function saveCountriesBorder() {
+  const rows = [['country1', 'country2']].concat(Object.values(borderPairs));
+  const borderPairsSerialized = d3.csvFormatRows(rows);
 
-fs.writeFile(
-  "./countries_border_processed.csv",
-  borderPairsSerialized,
-  function(err) {
-    if(err) {
-        return console.log(err);
+  fs.writeFile(
+    "./countries_border_processed.csv",
+    borderPairsSerialized,
+    function(err) {
+      if(err) {
+          return console.log(err);
+      }
+      console.log("countries_border_processed was saved!");
     }
-    console.log("The file was saved!");
-  }
-);
+  );
+})();
+
+(function saveCountriesCenters() {
+  const countryCentersProcessedWithHeader = [['country', 'x', 'y']]
+    .concat(countryCentersProcessed);
+  const countryCentersSerialized = d3
+    .csvFormatRows(countryCentersProcessedWithHeader);
+
+  fs.writeFile(
+    "./countries_centers_processed.csv",
+    countryCentersSerialized,
+    function(err) {
+      if(err) {
+          return console.log(err);
+      }
+      console.log("countries_centers_processed was saved!");
+    }
+  );
+})();
