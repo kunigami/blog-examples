@@ -3,6 +3,8 @@
 
 all: test
 run:
+	export OCAMLRUNPARAM="l=1000000000"
+	@echo $(OCAMLRUNPARAM)
 	ocamlfind ocamlc -o subsequence -package oUnit -package batteries -linkpkg -g  trie.ml subsequence.ml
 	./subsequence
 test: test_subsequence
