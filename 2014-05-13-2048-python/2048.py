@@ -1,7 +1,12 @@
 # 2048.py
 # CLI version of the 2048 game in python.
 from random import randint
-import sys
+import tty, sys
+
+def print_inline(s):
+    print(s, end='')
+def print_new_line():
+    print('')
 
 def count_zeroes():
     return sum([sum([1 for c in r if c == 0]) for r in x])
@@ -12,12 +17,9 @@ def max_value():
 def print_board():
     for i in range(0,4):
         for j in range(0,4):
-            print('{:5d}'.format(x[i][j])),
-        print ""
-    print ""
-
-def read_input():
-    return sys.stdin.readline()[0]
+            print_inline('{:5d}'.format(x[i][j])),
+        print_new_line()
+    print_new_line()
 
 def add_number():
     pos = randint(0, count_zeroes() - 1)
@@ -56,7 +58,7 @@ def process_move(c):
             changed = any([gravity(), sum_up(), gravity()])
             rotate(4-i)
             return changed
-    print "invalid move"
+    print ("invalid move")
     return False
 
 def rotate(n): # rotate 90 degrees n times
@@ -66,17 +68,32 @@ def rotate(n): # rotate 90 degrees n times
             for j in range(0,4):
                 x[i][3-j] = y[j][i]
 
+# Initialize board.
 x = [[0 for c in range(4)] for r in range(4)]
+
+def getc():
+    import sys, tty, termios
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
 
 add_number()
 while True:
     print_board()
-    move = read_input()
+    move = getc()
+    if (move == 'q'):
+        print_inline ("Exiting...\n")
+        break
     moved = process_move(move)
     if moved: add_number()
     if (max_value() >= 2048):
-        print "You win"
+        print_inline ("You win\n")
         break
-    if (count_zeroes == 0):
-        print "You lost"
+    if (count_zeroes() == 0):
+        print_inline ("You lost\n")
         break
