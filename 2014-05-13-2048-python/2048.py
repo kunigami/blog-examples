@@ -1,5 +1,8 @@
 # 2048.py
 # CLI version of the 2048 game in python.
+#
+# - wasd for controls
+# - Does not support windows
 from random import randint
 import tty, sys
 
