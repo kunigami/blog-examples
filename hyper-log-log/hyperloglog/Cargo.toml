@@ -1,0 +1,9 @@
+[package]
+name = "hyperloglog"
+version = "0.1.0"
+authors = ["Guilherme Kunigami <kunigami@fb.com>"]
+
+[dependencies]
+rand = "0.4.0"
+farmhash = "1.1.5"
+clap = "~2.31"
