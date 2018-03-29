@@ -4,7 +4,6 @@ extern crate rand;
 
 use rand::Rng;
 use std::cmp;
-use std::env;
 use std::vec::Vec;
 use clap::Arg;
 
@@ -36,7 +35,7 @@ fn main() {
     println!("Number of elements {}, range {}", num_elements, range_upper_bound);
 
     let mut elements = Vec::new();
-    for count in 0..num_elements {
+    for _ in 0..num_elements {
         let element = rand::thread_rng().gen_range(1, range_upper_bound).to_string();
         elements.push(element);
     }
@@ -71,26 +70,24 @@ fn hll(elements: &Vec<String>, options: Options) -> u32 {
     let m: u32 = 1 << b;
 
     const LARGE_ESTIMATE_THRESHOLD: f64 = 143165576.53333333;
-    let mut alpha: f64;
-    if b == 4 {
-        alpha = 0.673;
-    } else if b == 5 {
-        alpha = 0.697;
-    } else if b == 6 {
-        alpha = 0.709;
-    } else { // b >= 7
-        alpha = 0.7213/(1.0 + 1.079/(m as f64));
-    }
+    let alpha: f64 = match b {
+        4 => 0.673,
+        5 => 0.697,
+        6 => 0.709,
+        // b >= 7
+        _ => 0.7213/(1.0 + 1.079/(m as f64))
+    };
 
     let first_b_bits_mask = m - 1;
     let mut first_non_zero_by_bucket: Vec<u32> = vec![0 as u32; m as usize];
     for element in elements {
         let hash_value = hash(&element);
 
-        // Find the first non-zero bit
+        // Extracts the first b bits from hash_value to determine the bucket
+        let bucket_index: usize = (hash_value & first_b_bits_mask) as usize;
+        // Finds the position of the first 1 bit in the remaining bits
         let mut first_non_zero: u32 = first_non_zero_bit_position(hash_value >> b);
 
-        let bucket_index: usize = (hash_value & first_b_bits_mask) as usize;
         first_non_zero_by_bucket[bucket_index] = cmp::max(
             first_non_zero_by_bucket[bucket_index],
             first_non_zero
