@@ -28,11 +28,20 @@ fn main() {
                 .help("Sample values from [0-r]")
                 .takes_value(true)
         )
+        .arg(
+            Arg::with_name("experiments_factor")
+                .short("b")
+                .help(
+                    "Number of independent experiments to run to reduce the effect of \
+                     outliers. Provide b for 2^b experiments"
+                )
+                .takes_value(true)
+        )
         .get_matches();
 
     let num_elements: usize = matches.value_of("num_elems").unwrap_or("1000").parse().unwrap();
     let range_upper_bound: u32 = matches.value_of("range").unwrap_or("2500").parse().unwrap();
-    println!("Number of elements {}, range {}", num_elements, range_upper_bound);
+    let b: u32 = matches.value_of("experiments_factor").unwrap_or("10").parse().unwrap();
 
     let mut elements = Vec::new();
     for _ in 0..num_elements {
@@ -40,21 +49,16 @@ fn main() {
         elements.push(element);
     }
 
-    let estimate: u32 = hll(&elements, Options {b: 5});
-    println!("Distinct values estimate {}", estimate);
-
-    // Compare with deterministic algorithm
     let distinct = count_distinct(&elements);
-    println!("Distinct values {}", distinct);
-    println!(
-        "Relative error {}",
-        ((distinct as f64) - (estimate as f64)).abs()/(distinct as f64) * 100.0
-    );
+    let estimate: u32 = hll(&elements, Options {b});
+    let error = ((distinct as f64) - (estimate as f64)).abs()/(distinct as f64) * 100.0;
+    println!("Distinct values, Distinct values estimate, Error\n");
+    println!("{} {} {}", distinct, estimate, error);
 }
 
 struct Options {
     // b in [4-16]. There are 2^b buckets
-    b: i32
+    b: u32
 }
 
 /**
