@@ -79,34 +79,35 @@ fn hll(elements: &Vec<String>, options: Options) -> u32 {
     };
 
     let first_b_bits_mask = m - 1;
-    let mut first_non_zero_by_bucket: Vec<u32> = vec![0 as u32; m as usize];
+    let mut first_non_zero_by_experiment: Vec<u32> = vec![0 as u32; m as usize];
     for element in elements {
         let hash_value = hash(&element);
 
         // Extracts the first b bits from hash_value to determine the bucket
-        let bucket_index: usize = (hash_value & first_b_bits_mask) as usize;
+        let experiment_index: usize = (hash_value & first_b_bits_mask) as usize;
         // Finds the position of the first 1 bit in the remaining bits
         let mut first_non_zero: u32 = first_non_zero_bit_position(hash_value >> b);
 
-        first_non_zero_by_bucket[bucket_index] = cmp::max(
-            first_non_zero_by_bucket[bucket_index],
+        first_non_zero_by_experiment[experiment_index] = cmp::max(
+            first_non_zero_by_experiment[experiment_index],
             first_non_zero
         );
     }
 
     // Compute estimate
-    let mut estimate: f64 = 0.0;
+    let mut indicator: f64 = 0.0;
     let base: f64 = 2.0;
-    for first_non_zero in &first_non_zero_by_bucket {
-        estimate += base.powf(-(*first_non_zero as f64));
+    for first_non_zero in &first_non_zero_by_experiment {
+        indicator += base.powf(-(*first_non_zero as f64));
     }
     let m_multiplier = m as f64;
-    estimate = (m_multiplier * m_multiplier * alpha) / estimate;
+    let mut estimate: f64 = (m_multiplier * m_multiplier * alpha) / indicator;
 
+    // Correction
     if estimate <= 2.5 * m_multiplier {
         // Small range correction
         let mut buckets_with_zero = 0;
-        for first_non_zero in first_non_zero_by_bucket {
+        for first_non_zero in first_non_zero_by_experiment {
             if first_non_zero == 0 {
                 buckets_with_zero += 1;
             }
