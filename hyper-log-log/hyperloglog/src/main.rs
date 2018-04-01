@@ -117,11 +117,11 @@ fn hll(elements: &Vec<String>, options: Options) -> u32 {
             }
         }
         if buckets_with_zero > 0 {
-            estimate = m_multiplier * (m_multiplier / (buckets_with_zero as f64)).log2();
+            estimate = m_multiplier * (m_multiplier / (buckets_with_zero as f64)).ln();
         }
     } else if estimate > LARGE_ESTIMATE_THRESHOLD {
         // Large range correction
-        estimate = -TWO_TO_32 * (1.0 - estimate/TWO_TO_32).log2();
+        estimate = -TWO_TO_32 * (1.0 - estimate/TWO_TO_32).ln();
     }
     estimate as u32
 }
@@ -153,6 +153,9 @@ fn hash(value: &String) -> u32 {
 }
 
 fn first_non_zero_bit_position(input: u32) -> u32 {
+    if input == 0 {
+        return 0;
+    }
     let mut remaining: u32 = input;
     let mut first_non_zero: u32 = 1;
     while (remaining & 1) == 0 && remaining > 1 {

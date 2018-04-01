@@ -1,5 +1,12 @@
 #!/usr/bin/env zsh
 
+# Make sure cargo is installed
+hash cargo 2> /dev/null
+if [ $? -ne 0 ]; then
+   echo "You need to install cargo before running this script";
+   exit 1;
+fi
+
 # Build the program
 cd hyperloglog/
 cargo build --release
