@@ -1,0 +1,6 @@
+[package]
+name = "bulls_and_cows"
+version = "0.1.0"
+
+[dependencies]
+clap = "~2.31"
