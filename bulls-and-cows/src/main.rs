@@ -247,7 +247,7 @@ fn tree_to_string(tree: &Tree) -> String {
     }
     let guess_as_string = guess_to_string(&tree.guess);
     let subtrees_as_string = format!("{{{}}}", subtrees_as_strings.join(", "));
-    return format!("{{'guess': {}, 'subtree': {}}}", guess_as_string, subtrees_as_string);
+    return format!("[{}, {}]", guess_as_string, subtrees_as_string);
 }
 
 fn output_json(tree: &Tree) -> String {
