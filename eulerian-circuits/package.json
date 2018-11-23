@@ -1,0 +1,26 @@
+{
+  "name": "eulerian-circuits",
+  "version": "1.0.0",
+  "description": "",
+  "main": "eulerian_circuit.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "graph"
+  ],
+  "author": "kunigami",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-es2016": "^7.0.0-beta.53",
+    "@babel/preset-flow": "^7.0.0"
+  },
+  "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "flow-bin": "^0.86.0"
+  }
+}
