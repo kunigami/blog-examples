@@ -1,0 +1,5 @@
+To transpile the code and run the tests
+
+  npm install
+  make test
+  
