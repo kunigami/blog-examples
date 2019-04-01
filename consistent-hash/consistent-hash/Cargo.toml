@@ -1,0 +1,8 @@
+[package]
+name = "consistent-hash"
+version = "0.1.0"
+authors = ["Guilherme Kunigami <kunigami@gmail.com>"]
+
+[dependencies]
+farmhash = "1.1.5"
+clap = "~2.31"
