@@ -1,0 +1,3 @@
+Compile and run tests:
+
+  cargo test --lib -- --nocapture
