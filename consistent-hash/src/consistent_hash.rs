@@ -27,6 +27,13 @@ pub struct ConsistentHashTable {
 }
 
 impl ConsistentHashTable {
+    pub fn new() -> ConsistentHashTable {
+        return ConsistentHashTable {
+            containers: rbtree::RBTree::new(),
+            entries: HashSet::new(),
+            hash_function: hash_function,
+        };
+    }
 
     pub fn set_hash_function(&mut self, f: fn (&String) -> u32) {
         self.hash_function = f;

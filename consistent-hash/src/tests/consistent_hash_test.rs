@@ -1,9 +1,6 @@
 use consistent_hash;
 use consistent_hash::ConsistentHashTable;
 
-#[cfg(test)]
-extern crate mocktopus;
-
 fn run_command<'a>(hash_table: &'a mut ConsistentHashTable, command: &str) -> Option<&'a str> {
     if command.starts_with("add s") { // Captures add s<x>
         let server = &command[4..]; // s<x>
@@ -81,7 +78,7 @@ fn test_commands() {
         let commands = &instance.0;
         let query_results = &instance.1;
 
-        let mut hash_table = consistent_hash::new_hash_table();
+        let mut hash_table = ConsistentHashTable::new();
         hash_table.set_hash_function(predictable_hash);
 
         let mut query_results_index = 0;
