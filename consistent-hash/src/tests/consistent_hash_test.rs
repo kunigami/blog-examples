@@ -1,38 +1,35 @@
 use consistent_hash;
 use consistent_hash::ConsistentHashTable;
 
+#[cfg(test)]
+extern crate mocktopus;
+
 fn run_command<'a>(hash_table: &'a mut ConsistentHashTable, command: &str) -> Option<&'a str> {
     if command.starts_with("add s") { // Captures add s<x>
-        let server = &command[4..]; // k<x>
-        print!("insert entry: {}\n", server);
+        let server = &command[4..]; // s<x>
         hash_table.add_container(server.to_owned());
         return None;
     }
 
     if command.starts_with("remove s") { // Captures remove s<x>
         let server = &command[7..]; // s<x>
-        print!("removing entry: {}\n", server);
         hash_table.remove_container(server.to_owned());
         return None;
     }
 
     if command.starts_with("add k") { // Captures add k<x>
         let key = &command[4..]; // k<x>
-        print!("adding key: {}\n", key);
         hash_table.add_entry(key.to_owned());
         return None;
     }
 
     if command.starts_with("query k") {
         let key = &command[6..];
-        print!("query: {}\n", key);
-        let query_id = &command[0..1];
-        let result = hash_table.get_container_id_for_entry("k1".to_owned());
+        let result = hash_table.get_container_id_for_entry(key.to_owned());
         let id = match result {
             Ok(id) => id,
             Err(error) => panic!("Invalid")
         };
-        print!("Got server: {}\n", id);
         return Some(id);
     }
 
@@ -51,19 +48,32 @@ fn test_commands() {
     // query k<x> - represents querying the server to which k<x> is assigned to
     let data: Vec<(Vec<&str>, Vec<&str>)> = vec![
         // Case 1: inserting a key with a bunch of pre-existing servers
-        (vec!["add s1", "add s2", "add s3", "add k1", "query k1"], vec!["s1"]),
+        (vec!["add s10", "add s20", "add s30", "add k9", "query k9"], vec!["s10"]),
         // Case 2: inserting a key with a bunch of pre-existing servers then removing a server
         (
             vec![
-                "add s1",
-                "add s2",
-                "add s3",
-                "add k1",
-                "query k1",
-                "remove s1",
-                "query k1"
+                "add s10",
+                "add s20",
+                "add s30",
+                "add k9",
+                "query k9",
+                "remove s10",
+                "query k9",
+                "remove s20",
+                "query k9"
             ],
-            vec!["s1", "s2"]
+            vec!["s10", "s20", "s30"]
+        ),
+        // Case 3: all containers are smaller than the queried value
+        (
+            vec![
+                "add s10",
+                "add s20",
+                "add k100",
+                "add s30",
+                "query k100",
+            ],
+            vec!["s10"]
         ),
     ];
 
@@ -72,6 +82,7 @@ fn test_commands() {
         let query_results = &instance.1;
 
         let mut hash_table = consistent_hash::new_hash_table();
+        hash_table.set_hash_function(predictable_hash);
 
         let mut query_results_index = 0;
 
@@ -83,11 +94,17 @@ fn test_commands() {
                 Some(actual_server) => {
                     let expected_server = query_results[query_results_index];
                     query_results_index += 1;
-
-                    print!("Got server: {}, expected {}\n", actual_server, expected_server);
                     assert_eq!(actual_server, expected_server);
                 }
             }
         }
     }
+}
+
+/*
+ * A hash function that dummily maps the numeric part of the key to a value
+ */
+fn predictable_hash(value: &String) -> u32 {
+    let numeric_part = &value[1..];
+    return numeric_part.parse::<u32>().unwrap();
 }
