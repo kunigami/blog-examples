@@ -1,0 +1,39 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{PRODES ILP}
+\author{Guilherme Kunigami}
+\date{September 2019}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+This document describes an integer linear programming for the Protein Design model PRODES.
+
+\section{Model}
+
+\textbf{Constants.} Let $P$ as the set of positions. Let $R_p$ be the set of rotamers available at position $p \in P$. Let $R$ be the set of all rotamers (i.e. $R = \bigcup_{p in P} R_p$). The coefficient $e_{i,j}$ indicates the cost between rotamer $i$ and $j$.
+\\
+\\
+\textbf{Variables.} Let $r_{i} \in \{0, 1\}$. $r_{i} = 1$ if we pick rotamer $i \in R$. Let $x_{i,j} \in \{0, 1\}$, $x_{i,j} = 1$ if both rotamer $i$ and $j$ are picked, for all $i \in R_p, j \in R_q$, where $p, q \in P$ and $p < q$.
+\\
+\paragraph{Objective function}
+$$
+\min \sum_{i} \sum_{j, j < i}x_{i,j} e_{i,j}
+$$
+
+\paragraph{Constraints}
+\begin{align}
+\sum_{i \in R_p} r_{i} & = 1 \quad \forall p \in R \\
+r_{i} & = \sum_{j \in R_q} x_{i, j} \quad \forall i \in R_p, \mbox{such that } p, q \in P, p < q \\
+r_{j} & = \sum_{i \in R_p} x_{i, j} \quad \forall j \in  R_q, \mbox{such that } p, q \in P, p < q
+\end{align}
+
+Equation (1) says we should pick exactly one rotamer for each position. Constraints (2) and (3) enforces that $x_{i, j} = 1$ if and only if $r_i = r_j = 1$.
+
+
+\end{document}
