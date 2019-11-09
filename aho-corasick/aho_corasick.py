@@ -9,7 +9,9 @@ class Node:
         self.entry = None
         # links to the next suffix that is a keyword
         self.output = None
-        # longest proper suffix that is another node
+        # longest proper suffix that is another node - this is only needed
+        # to construct the structure but it's simpler to co-locate with
+        # the node.
         self.suffix = None
 
     def get_matches(self):
@@ -22,9 +24,12 @@ class Node:
         return matches
 
 
+# I dislike the fact we need to construct the alphabet explicitly,
+# just so we can avoid the while loop in the search function, as
+# Aho and Corasick's paper describes.
 def get_letters(entries):
-    alphabet = set()
-    for entry in entries:
+  alphabet = set()
+   for entry in entries:
         for c in entry:
             alphabet.add(c)
 
@@ -74,7 +79,7 @@ def build_structure(entries):
             if jump_node is child:  # cannot jump to itself
                 jump_node = trie
             child.suffix = jump_node
-
+            
             if jump_node.entry is not None:
                 child.output = jump_node
             else:
@@ -87,15 +92,16 @@ def build_structure(entries):
 
 def search(text, entries):
     lookup = build_structure(entries)
-    # return
     node = lookup
     match_pairs = []
     for i, c in enumerate(text):
         if c in node.goto:
             node = node.goto[c]
         elif c in node.fail:
-            node = node.fail[c]
-        else:
+            node = node.fail[c]          
+        # This can happen if c is a character that only exists in H but not
+        # in S
+        else: 
             node = lookup
         matches = node.get_matches()
         if len(matches) > 0:
