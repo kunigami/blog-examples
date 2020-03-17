@@ -7,5 +7,15 @@ on the number of edges.
 To transpile the code and run the tests
 
     npm install
-    make test
+    make run
+  
+
+## More Dependencies
+
+* yarn: https://classic.yarnpkg.com/en/docs/install/#debian-stable
+
+* flow (see latest instructions in https://flow.org/en/docs/install/)
+  * yarn add --dev @babel/core @babel/cli @babel/preset-flow
+  * yarn run babel src/ -- -d lib/
+  * yarn add --dev flow-bin
   

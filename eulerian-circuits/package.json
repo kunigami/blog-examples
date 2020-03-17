@@ -12,15 +12,15 @@
   "author": "kunigami",
   "license": "ISC",
   "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.6",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/preset-env": "^7.1.6",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.8.6",
     "@babel/preset-es2016": "^7.0.0-beta.53",
-    "@babel/preset-flow": "^7.0.0"
+    "@babel/preset-flow": "^7.8.3"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
-    "flow-bin": "^0.86.0"
+    "@babel/polyfill": "^7.8.3",
+    "flow-bin": "^0.120.1"
   }
 }
