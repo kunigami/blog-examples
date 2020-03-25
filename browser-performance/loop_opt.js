@@ -1,6 +1,6 @@
 function random_array() {
     a = []
-    for (let i = 0; i < 1000000; i++) {
+    for (let i = 0; i < 10000000; i++) {
         a.push(Math.random());
     }
     return a;
@@ -26,13 +26,13 @@ function reduce(a) {
 
 function benchmark(fn, runs = 10) {
     let durations = 0;
-        start = performance.now();
     let r = 0;
     for (let i = 0; i < runs; i++) {
         a = random_array();
+        start = performance.now();
         r += fn(a);
+        durations += performance.now() - start;
     }
-    durations = performance.now() - start;
     return durations / runs;
 }
 
