@@ -5,6 +5,7 @@ if __name__ == '__main__':
 
     frequency_map = {}
 
+    # Download this file from https://www.gutenberg.org/files/1342/1342-h/1342-h.htm
     filename = 'pride-and-prejudice.txt'
     i = 0
     text = ''
