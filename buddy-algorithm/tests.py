@@ -5,7 +5,7 @@ from buddy_algorithm import \
     Allocator, \
     MAX_SIZE_CLASS, \
     MIN_SIZE_CLASS, \
-    OFFSET_BLOCK
+    buddy_address
 
 class BuddyAlgorithmTest(unittest.TestCase):
 
@@ -82,6 +82,7 @@ class BuddyAlgorithmTest(unittest.TestCase):
             allocator.free(addr)
 
         histo = allocator.get_histogram()
+        print(histo)
         self.assertEqual(histo[MAX_SIZE_CLASS], 1)
 
 
@@ -89,24 +90,21 @@ class MemoryTest(unittest.TestCase):
 
     def testRightBuddyAddress(self):
         class_size = MIN_SIZE_CLASS + 2
-        addr = 0 + OFFSET_BLOCK
-        allocator = Allocator()
-        buddy_addr = allocator.buddy_addr(addr, class_size)
-        self.assertEqual(buddy_addr, 2**class_size + OFFSET_BLOCK)
+        addr = 0
+        buddy_addr = buddy_address(addr, class_size)
+        self.assertEqual(buddy_addr, 2**class_size)
 
     def testLeftBuddyAddress(self):
         class_size = MIN_SIZE_CLASS + 2
-        addr = 2**class_size + OFFSET_BLOCK
-        allocator = Allocator()
-        buddy_addr = allocator.buddy_addr(addr, class_size)
-        self.assertEqual(buddy_addr, 0 + OFFSET_BLOCK)
+        addr = 2**class_size
+        buddy_addr = buddy_address(addr, class_size)
+        self.assertEqual(buddy_addr, 0)
 
     def testRightBuddyAddress2(self):
         class_size = MIN_SIZE_CLASS + 2
-        addr = 2**class_size + OFFSET_BLOCK
-        allocator = Allocator()
-        buddy_addr = allocator.buddy_addr(addr, class_size - 1)
-        self.assertEqual(buddy_addr, 3*(2**(class_size - 1)) + OFFSET_BLOCK)
+        addr = 2**class_size
+        buddy_addr = buddy_address(addr, class_size - 1)
+        self.assertEqual(buddy_addr, 3*(2**(class_size - 1)))
 
 if __name__ == '__main__':
     unittest.main()

@@ -23,16 +23,6 @@ USED = 1
 
 # FLAG | SIZE | PREV | NEXT
 HEADER_SIZE = 4
-SENTINEL_SIZE_CLASS = 3
-# To mimick the structure of a block: [_flag, size, prev, next, <empty>, size]
-# size = 3 so that 1<<3 = 8 has a valid block size and > space needed for metadata.
-SIZE_SENTINEL = 1 << SENTINEL_SIZE_CLASS
-SENTINEL_COUNT = MAX_SIZE_CLASS + 1
-# One sentinel per memory size class
-SENTINELS_SIZE = SIZE_SENTINEL*SENTINEL_COUNT
-
-# Position in memory where dynamic blocks are stored
-OFFSET_BLOCK = SENTINELS_SIZE
 
 class Allocator:
 
@@ -41,7 +31,7 @@ class Allocator:
         self.memory = Memory(MEM_SIZE)
         free_blocks = self.get_free_blocks()
 
-        block = self.get_block_at(OFFSET_BLOCK)
+        block = self.get_block_at(self.block_memory_offset())
 
         # Represents the single full block
         block.set_free()
@@ -50,6 +40,10 @@ class Allocator:
         free_blocks.clear()
         free_blocks.add_block(block)
 
+    def block_memory_offset(self):
+        free_blocks = self.get_free_blocks()
+        return free_blocks.get_size()
+
     def get_free_blocks(self):
         return ListsOfBlocks(MIN_SIZE_CLASS, MAX_SIZE_CLASS, self.memory)
 
@@ -57,7 +51,7 @@ class Allocator:
         free_blocks = self.get_free_blocks()
         size_class = free_blocks.get_fittest_size_class(size)
 
-        if size_class == SENTINEL_COUNT:
+        if size_class == free_blocks.get_larget_class_size() + 1:
             raise Exception('Memory is full')
 
         # Get first block from the list
@@ -124,22 +118,28 @@ class Allocator:
 
         free_blocks.add_block(block)
 
-    def buddy_addr(self, addr, size_class):
-        addr = addr - OFFSET_BLOCK
-        # Current address is the first buddy
-        parent = 2**(size_class + 1)
-        if addr % parent == 0:
-            buddy_addr = addr + (1 << size_class)
-        else: # Current address is the second buddy
-            buddy_addr = addr - (1 << size_class)
-        return buddy_addr + OFFSET_BLOCK
-
     def get_buddy(self, block, size_class):
-        buddy_addr = self.buddy_addr(block.addr, size_class)
+        virtual_addr = block.addr - self.block_memory_offset()
+        buddy_virtual_addr = buddy_address(virtual_addr, size_class)
+        buddy_addr = buddy_virtual_addr + self.block_memory_offset()
         return Block(buddy_addr, self.memory)
 
     def get_histogram(self):
         return self.get_free_blocks().get_histogram()
+
+def buddy_address(addr, size_class):
+    # Current address is the first buddy
+    parent = 2**(size_class + 1)
+    if addr % parent == 0:
+        buddy_addr = addr + (1 << size_class)
+    else: # Current address is the second buddy
+        buddy_addr = addr - (1 << size_class)
+    return buddy_addr
+
+SENTINEL_SIZE_CLASS = 3
+# To mimick the structure of a block: [_flag, size, prev, next, <empty>, size]
+# size = 3 so that 1<<3 = 8 has a valid block size and > space needed for metadata.
+SIZE_SENTINEL = 1 << SENTINEL_SIZE_CLASS
 
 class ListsOfBlocks:
 
@@ -147,6 +147,9 @@ class ListsOfBlocks:
         self.lower_bound_size = lower_bound_size
         self.upper_bound_size = upper_bound_size
         self.memory = memory
+
+    def get_size(self):
+        return (self.upper_bound_size + 1)*SIZE_SENTINEL
 
     def clear(self):
         for k in range(self.lower_bound_size, self.upper_bound_size + 1):
