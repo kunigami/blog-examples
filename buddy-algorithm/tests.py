@@ -75,7 +75,6 @@ class BuddyAlgorithmTest(unittest.TestCase):
         for i in range(5):
             random_size = random.randint(100, 2**(MAX_SIZE_CLASS/2))
             addr = allocator.alloc(random_size)
-            print('size', random_size)
             addresses.append(addr)
 
         # Deallocate all memory
@@ -105,7 +104,6 @@ class MemoryTest(unittest.TestCase):
     def testRightBuddyAddress2(self):
         class_size = MIN_SIZE_CLASS + 2
         addr = 2**class_size + OFFSET_BLOCK
-        print('addr', addr - OFFSET_BLOCK)
         allocator = Allocator()
         buddy_addr = allocator.buddy_addr(addr, class_size - 1)
         self.assertEqual(buddy_addr, 3*(2**(class_size - 1)) + OFFSET_BLOCK)
