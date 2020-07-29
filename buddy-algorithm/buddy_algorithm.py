@@ -10,10 +10,10 @@ High level layout of the memory:
 
 Layout of a block:
 
-[FLAG | SIZE | PREV | NEXT | ACTUAL_MEMORY | SIZE ]
+[FLAG | SIZE | PREV | NEXT | ACTUAL_MEMORY]
 
-FLAG, SIZE, PREV, NEXT all occupy 1 unit of memory, and ACTUAL_MEMORY
-occupies SIZE units. The actual size of the block is thus SIZE + 5.
+FLAG, SIZE, PREV, NEXT all occupy 1 unit of memory. The size of the block is 2^SIZE,
+so ACTUAL_MEMORY is 2^SIZE - 4 units.
 
 FLAG is [0, 1]. 0 means available (FREE), 1 means used (USED)
 """
@@ -21,9 +21,8 @@ FLAG is [0, 1]. 0 means available (FREE), 1 means used (USED)
 FREE = 0
 USED = 1
 
-METADATA_SIZE = 5
 # FLAG | SIZE | PREV | NEXT
-HEADER_SIZE = 4
+HEADER_SIZE = METADATA_SIZE
 SENTINEL_SIZE_CLASS = 3
 # To mimick the structure of a block: [_flag, size, prev, next, <empty>, size]
 # size = 3 so that 1<<3 = 8 has a valid block size and > space needed for metadata.
@@ -146,7 +145,7 @@ class Allocator:
 
     # Actual size available for use
     def actual_size(self, size_class):
-        return (1 << size_class) - METADATA_SIZE
+        return (1 << size_class) - HEADER_SIZE
 
     def get_block_memory_addr(self, block_addr):
         return block_addr + HEADER_SIZE

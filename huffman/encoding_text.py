@@ -7,7 +7,7 @@ if __name__ == '__main__':
 
     # Download this file from https://www.gutenberg.org/files/1342/1342-h/1342-h.htm
     filename = 'pride-and-prejudice.txt'
-    i = 0
+    ccount = 0
     text = ''
     words = []
     with open(filename, "r") as file:
@@ -16,8 +16,13 @@ if __name__ == '__main__':
                 if c not in frequency_map:
                     frequency_map[c] = 0
                 frequency_map[c] += 1
+                ccount += 1
             text += line
             words += [w.strip(' \n.,”“') for w in line.split()]
+
+    print('= Stats =')
+    print('Number of characters', ccount)
+    print('Number of words', len(words))
 
     min_entropy = compute_entropy(frequency_map.values())
     print('Minimum entropy', min_entropy)
@@ -41,6 +46,12 @@ if __name__ == '__main__':
             frequency_map[w] = 0
         frequency_map[w] += 1
     avg_word_size = text_length / len(words)
+
+    # Add spaces since we need to distinguish one word from another.
+    # Note that this isn't needed for Huffman
+    text_length += len(words)
+
+    print('Average word size', avg_word_size)
 
     min_entropy = compute_entropy(frequency_map.values())
     print('Minimum entropy', min_entropy / avg_word_size)

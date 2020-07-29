@@ -95,7 +95,6 @@ def decode(encoded, tree):
     node = tree
     text = ''
     for bit in encoded:
-
         if bit is False:
             node = node.left
         else:
@@ -104,7 +103,6 @@ def decode(encoded, tree):
         if node.symbol is not None:
             text += node.symbol
             node = tree
-
 
     return text
 
