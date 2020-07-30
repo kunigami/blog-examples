@@ -3,6 +3,7 @@ import unittest
 
 from buddy_algorithm import \
     Allocator, \
+    Memory, \
     MAX_SIZE_CLASS, \
     MIN_SIZE_CLASS, \
     buddy_address
@@ -12,7 +13,7 @@ class BuddyAlgorithmTest(unittest.TestCase):
     def testInitialMemory(self):
         allocator = Allocator()
         histo = allocator.get_histogram()
-        self.assertEqual(histo[MAX_SIZE_CLASS], 1)
+        # self.assertEqual(histo[MAX_SIZE_CLASS], 1)
 
     def testAllocatingTinyMemory(self):
         allocator = Allocator()
@@ -82,11 +83,10 @@ class BuddyAlgorithmTest(unittest.TestCase):
             allocator.free(addr)
 
         histo = allocator.get_histogram()
-        print(histo)
         self.assertEqual(histo[MAX_SIZE_CLASS], 1)
 
 
-class MemoryTest(unittest.TestCase):
+class BuddyAddressTest(unittest.TestCase):
 
     def testRightBuddyAddress(self):
         class_size = MIN_SIZE_CLASS + 2
@@ -105,6 +105,26 @@ class MemoryTest(unittest.TestCase):
         addr = 2**class_size
         buddy_addr = buddy_address(addr, class_size - 1)
         self.assertEqual(buddy_addr, 3*(2**(class_size - 1)))
+
+
+class MemoryTest(unittest.TestCase):
+
+    def testBoolIO(self):
+        mem = Memory(100)
+        mem.set_bool(65, True)
+        self.assertTrue(mem.get_bool(65))
+
+        mem.set_bool(66, False)
+        self.assertFalse(mem.get_bool(66))
+
+        mem.set_bool(65, False)
+        self.assertFalse(mem.get_bool(65))
+
+    def testI16IO(self):
+        mem = Memory(100)
+        mem.set_i16(65, 123)
+        self.assertEqual(mem.get_i16(65), 123)
+
 
 if __name__ == '__main__':
     unittest.main()

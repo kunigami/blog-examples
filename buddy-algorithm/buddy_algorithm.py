@@ -1,5 +1,11 @@
+from bitarray.util import int2ba, ba2int
+from bitarray import bitarray
+
 MAX_SIZE_CLASS = 14
 MIN_SIZE_CLASS = 8
+
+INT_SIZE = 32
+BOOL_SIZE = 1
 
 MEM_SIZE = 1 << (MAX_SIZE_CLASS + 1)
 
@@ -20,9 +26,6 @@ FLAG is [0, 1]. 0 means available (FREE), 1 means used (USED)
 
 FREE = 0
 USED = 1
-
-# FLAG | SIZE | PREV | NEXT
-HEADER_SIZE = 4
 
 class Allocator:
 
@@ -136,10 +139,9 @@ def buddy_address(addr, size_class):
         buddy_addr = addr - (1 << size_class)
     return buddy_addr
 
-SENTINEL_SIZE_CLASS = 3
 # To mimick the structure of a block: [_flag, size, prev, next, <empty>, size]
 # size = 3 so that 1<<3 = 8 has a valid block size and > space needed for metadata.
-SIZE_SENTINEL = 1 << SENTINEL_SIZE_CLASS
+SIZE_SENTINEL = 1 << MIN_SIZE_CLASS
 
 class ListsOfBlocks:
 
@@ -198,8 +200,17 @@ class ListsOfBlocks:
         return histo
 
 # Offsets within a block
-OFFSET_PREV = 2
-OFFSET_NEXT = 3
+
+# FLAG | SIZE | PREV | NEXT | ACTUAL_MEMORY
+FLAG_SIZE = BOOL_SIZE
+SIZE_SIZE = INT_SIZE
+PREV_SIZE = INT_SIZE
+NEXT_SIZE = INT_SIZE
+
+OFFSET_SIZE = FLAG_SIZE
+OFFSET_PREV = OFFSET_SIZE + SIZE_SIZE
+OFFSET_NEXT = OFFSET_PREV + PREV_SIZE
+OFFSET_ACTUAL_MEMORY = OFFSET_NEXT + NEXT_SIZE
 
 class Block:
 
@@ -209,42 +220,42 @@ class Block:
 
     @staticmethod
     def from_user_addr(user_addr, memory):
-        return Block(user_addr - HEADER_SIZE, memory)
+        return Block(user_addr - OFFSET_ACTUAL_MEMORY, memory)
 
     @staticmethod
     def get_actual_size(size_class):
-        return (1 << size_class) - HEADER_SIZE
+        return (1 << size_class) - OFFSET_ACTUAL_MEMORY
 
     def get_user_addr(self):
-        return self.addr + HEADER_SIZE
+        return self.addr + OFFSET_ACTUAL_MEMORY
 
     def set_used(self):
-        self.memory.write_bool(self.addr, USED)
+        self.memory.set_bool(self.addr, USED)
 
     def is_used(self):
         return self.memory.get_bool(self.addr) == USED
 
     def set_free(self):
-        self.memory.write_bool(self.addr, FREE)
+        self.memory.set_bool(self.addr, FREE)
 
     def set_size(self, size):
-        self.memory.write_i16(self.addr + 1, size)
+        self.memory.set_i32(self.addr + OFFSET_SIZE, size)
 
     def get_size(self):
-        return self.memory.get_i16(self.addr + 1)
+        return self.memory.get_i32(self.addr + OFFSET_SIZE)
 
     def set_prev(self, block):
-        self.memory.write_i16(self.addr + OFFSET_PREV, block.addr)
+        self.memory.set_i32(self.addr + OFFSET_PREV, block.addr)
 
     def get_prev(self):
-        addr = self.memory.get_i16(self.addr + OFFSET_PREV)
+        addr = self.memory.get_i32(self.addr + OFFSET_PREV)
         return Block(addr, self.memory)
 
     def set_next(self, block):
-        self.memory.write_i16(self.addr + OFFSET_NEXT, block.addr)
+        self.memory.set_i32(self.addr + OFFSET_NEXT, block.addr)
 
     def get_next(self):
-        addr = self.memory.get_i16(self.addr + OFFSET_NEXT)
+        addr = self.memory.get_i32(self.addr + OFFSET_NEXT)
         return Block(addr, self.memory)
 
     def equal(self, other):
@@ -268,16 +279,23 @@ class Block:
 class Memory:
 
     def __init__(self, size):
-        self.memory = [0]*size
+        self.memory = bitarray([0]*size, endian='little')
 
-    def write_bool(self, addr, val):
+    def set_bool(self, addr, val):
         self.memory[addr] = val
 
     def get_bool(self, addr):
         return self.memory[addr]
 
-    def write_i16(self, addr, val):
-        self.memory[addr] = val
+    def set_i32(self, addr, val):
+        bitarr = int2ba(val, length=INT_SIZE, endian='little')
+        self.set_bitarray(addr, bitarr)
 
-    def get_i16(self, addr):
-        return self.memory[addr]
+    def get_i32(self, addr):
+        bitarr = self.memory[addr:addr + INT_SIZE]
+        val = ba2int(bitarr)
+        return val
+
+    # Instead of setting one bit, set an entire array
+    def set_bitarray(self, addr, bitarr):
+        self.memory[addr:addr+len(bitarr)] = bitarr
