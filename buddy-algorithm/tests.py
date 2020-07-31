@@ -122,8 +122,8 @@ class MemoryTest(unittest.TestCase):
 
     def testI16IO(self):
         mem = Memory(100)
-        mem.set_i16(65, 123)
-        self.assertEqual(mem.get_i16(65), 123)
+        mem.set_i32(65, 123)
+        self.assertEqual(mem.get_i32(65), 123)
 
 
 if __name__ == '__main__':

@@ -38,45 +38,44 @@ class Allocator:
 
         # Represents the single full block
         block.set_free()
-        block.set_size(free_blocks.get_larget_class_size())
+        block.set_size_class(free_blocks.get_larget_size_class())
 
         free_blocks.clear()
         free_blocks.add_block(block)
 
     def block_memory_offset(self):
         free_blocks = self.get_free_blocks()
-        return free_blocks.get_size()
+        return free_blocks.get_size_class()
 
     def get_free_blocks(self):
-        return ListsOfBlocks(MIN_SIZE_CLASS, MAX_SIZE_CLASS, self.memory)
+        return BlockListBySize(MIN_SIZE_CLASS, MAX_SIZE_CLASS, self.memory)
 
     def alloc(self, size):
         free_blocks = self.get_free_blocks()
-        size_class = free_blocks.get_fittest_size_class(size)
+        block = free_blocks.get_smallest_available_block(size)
 
-        if size_class == free_blocks.get_larget_class_size() + 1:
+        if block is None:
             raise Exception('Memory is full')
-
-        # Get first block from the list
-        head = free_blocks.get_list_head(size_class)
-        block = head.get_next()
 
         block.remove_from_list()
 
+        size_class = block.get_size_class()
         # Keep splitting the blocks to avoid allocating too much memory
-        while size_class > MIN_SIZE_CLASS and Block.get_actual_size(size_class - 1) >= size:
+        while size_class > MIN_SIZE_CLASS and \
+            Block.get_actual_size(size_class - 1) >= size:
+
             new_size_class = size_class - 1
 
             # Add the other half to the list
             buddy = self.get_buddy(block, new_size_class)
             buddy.set_free()
-            buddy.set_size(new_size_class)
+            buddy.set_size_class(new_size_class)
             free_blocks.add_block(buddy)
 
             size_class = new_size_class
 
         block.set_used()
-        block.set_size(size_class)
+        block.set_size_class(size_class)
         return block.get_user_addr()
 
     def get_block_at(self, addr):
@@ -90,35 +89,26 @@ class Allocator:
     def merge(self, block):
         free_blocks = self.get_free_blocks()
 
-        original_size = block.get_size()
-        size = original_size
-        while True:
-            # No merge to be done
-            if size == MAX_SIZE_CLASS:
-                break
-
-            buddy = self.get_buddy(block, size)
+        size_class = block.get_size_class()
+        while size_class < MAX_SIZE_CLASS:
+            buddy = self.get_buddy(block, size_class)
             # Can't merge
             if buddy.is_used():
                 break
 
             # Buddy is not completely free (partially used)
-            if buddy.get_size() != size:
+            if buddy.get_size_class() != size_class:
                 break
 
             buddy.remove_from_list()
 
-            # Points to the leftmost of the pair
-            # (address of the merged block)
+            # Points to the leftmost of the pair (address of the merged block)
             if (block.addr > buddy.addr):
                 block = buddy
 
-            size = size + 1
+            size_class = size_class + 1
 
-        # No merge happened
-        if size != original_size:
-            block.set_size(size)
-
+        block.set_size_class(size_class)
         free_blocks.add_block(block)
 
     def get_buddy(self, block, size_class):
@@ -131,73 +121,103 @@ class Allocator:
         return self.get_free_blocks().get_histogram()
 
 def buddy_address(addr, size_class):
-    # Current address is the first buddy
-    parent = 2**(size_class + 1)
-    if addr % parent == 0:
-        buddy_addr = addr + (1 << size_class)
-    else: # Current address is the second buddy
-        buddy_addr = addr - (1 << size_class)
-    return buddy_addr
+    return addr ^ (1 << size_class)
 
 # To mimick the structure of a block: [_flag, size, prev, next, <empty>, size]
 # size = 3 so that 1<<3 = 8 has a valid block size and > space needed for metadata.
 SIZE_SENTINEL = 1 << MIN_SIZE_CLASS
 
-class ListsOfBlocks:
+class BlockListBySize:
 
     def __init__(self, lower_bound_size, upper_bound_size, memory):
         self.lower_bound_size = lower_bound_size
         self.upper_bound_size = upper_bound_size
         self.memory = memory
 
-    def get_size(self):
+    def get_size_class(self):
         return (self.upper_bound_size + 1)*SIZE_SENTINEL
 
     def clear(self):
         for k in range(self.lower_bound_size, self.upper_bound_size + 1):
-            head = self.get_list_head(k)
-            # Both prev/next point to itself
-            head.set_next(head)
-            head.set_prev(head)
+            block_list = self.get_block_list(k)
+            block_list.clear()
 
-    def get_larget_class_size(self):
+    def get_larget_size_class(self):
         return self.upper_bound_size
 
     def add_block(self, block):
-        size_class = block.get_size()
-        self.get_list_head(size_class).insert_after(block)
+        size_class = block.get_size_class()
+        self.get_block_list(size_class).inset_front(block)
 
-    def get_list_head(self, size_class):
+    def get_block_list(self, size_class):
         addr = size_class*SIZE_SENTINEL
-        return Block(addr, self.memory)
+        return BlockList(addr, self.memory, size_class)
 
-    def is_empty(self, size_class):
-        head = self.get_list_head(size_class)
-        return head.get_next().addr == head.addr
+    def get_smallest_available_block(self, size):
+        for size_class in self.size_class_range():
+            block_list = self.get_block_list(size_class)
+            if (block_list.has_available_block(size)):
+                return block_list.get_first()
 
-    def get_fittest_size_class(self, size):
-        size_class = self.lower_bound_size
-        while size_class <= self.upper_bound_size and \
-            (Block.get_actual_size(size_class) < size or self.is_empty(size_class)):
-            size_class += 1
-        return size_class
+        return None
+
+    def size_class_range(self):
+        return range(self.lower_bound_size, self.upper_bound_size + 1)
 
     # For debugging / testing
     def get_histogram(self):
         histo = {}
         for k in range(self.lower_bound_size, self.upper_bound_size + 1):
-            block_count = 0
-            head = self.get_list_head(k)
-            block = head.get_next()
-            while not block.equal(head):
-                block_count += 1
-                new_block = block.get_next()
-                assert not block.equal(new_block), f"Corrupted list for size {k}"
-                block = new_block
-
+            block_count = self.get_block_list(k).length()
             if block_count > 0:
                 histo[k] = block_count
         return histo
+
+class BlockList:
+    def __init__(self, addr, memory, size_class):
+        self.head = Block(addr, memory)
+        self.size_class = size_class
+
+    def clear(self):
+        # Both prev/next point to itself
+        self.head.set_next(self.head)
+        self.head.set_prev(self.head)
+
+    def is_empty(self):
+        return self.head.get_next().equal(self.head)
+
+    def get_first(self):
+        assert not self.is_empty(), f"List must not be empty"
+        return self.head.get_next()
+
+    def inset_front(self, block):
+        self.head.insert_after(block)
+
+    def has_available_block(self, size):
+        return not self.is_empty() and Block.get_actual_size(self.size_class) >= size
+
+    def length(self):
+        block_count = 0
+        for block in self:
+            block_count += 1
+        return block_count
+
+    def __iter__(self):
+        return BlockListIterator(self.head)
+
+
+class BlockListIterator:
+    def __init__(self, head):
+        self.block = head
+        self.head = head
+
+    def __next__(self):
+        new_block = self.block.get_next()
+
+        if new_block.equal(self.head):
+            raise StopIteration
+
+        self.block = new_block
 
 # Offsets within a block
 
@@ -238,10 +258,10 @@ class Block:
     def set_free(self):
         self.memory.set_bool(self.addr, FREE)
 
-    def set_size(self, size):
-        self.memory.set_i32(self.addr + OFFSET_SIZE, size)
+    def set_size_class(self, size_class):
+        self.memory.set_i32(self.addr + OFFSET_SIZE, size_class)
 
-    def get_size(self):
+    def get_size_class(self):
         return self.memory.get_i32(self.addr + OFFSET_SIZE)
 
     def set_prev(self, block):
