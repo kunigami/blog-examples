@@ -58,7 +58,13 @@ class Allocator:
             raise Exception('Memory is full')
 
         block.remove_from_list()
+        block = self.split(block, size)
+        block.set_used()
 
+        return block.get_user_addr()
+
+    def split(self, block, size):
+        free_blocks = self.get_free_blocks()
         size_class = block.get_size_class()
         # Keep splitting the blocks to avoid allocating too much memory
         while size_class > MIN_SIZE_CLASS and \
@@ -74,9 +80,8 @@ class Allocator:
 
             size_class = new_size_class
 
-        block.set_used()
         block.set_size_class(size_class)
-        return block.get_user_addr()
+        return block
 
     def get_block_at(self, addr):
         return Block(addr, self.memory)
