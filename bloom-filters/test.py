@@ -25,7 +25,7 @@ class TestBloomFilter(unittest.TestCase):
 
     def testInputIsFalsePositiveUntilInserted(self):
         n = 100
-        bf = BloomFilter(n/2, n)
+        bf = BloomFilter(int(n/2), n)
         fp = [False]*n
         inserted = [False]*n
         fp_cnt = 0

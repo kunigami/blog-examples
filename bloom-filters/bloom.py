@@ -1,5 +1,7 @@
+# pip install bitarray
+# pip install mmh3
 from bitarray import bitarray
-from pyhash import murmur3_x64_128
+from mmh3 import hash128 
 from math import log
 
 class BloomFilter:
@@ -21,7 +23,6 @@ class BloomFilter:
         self.size = size
         self.bitArr = bitarray(size)
         self.bitArr.setall(False)
-        self.hasher = murmur3_x64_128()
 
         # Number of hash functions that minimizes the
         # probability of false positives
@@ -44,8 +45,8 @@ class BloomFilter:
         return self.bitArr.count(boolean)
 
     def __getHashes(self, value):
-        h128 = self.hasher(str(value))
-        h64l = h128 & ((1L << 64) - 1)
+        h128 = hash128(str(value))
+        h64l = h128 & ((1 << 64) - 1)
         h64u = h128 >> 64
 
         hashes = map(
